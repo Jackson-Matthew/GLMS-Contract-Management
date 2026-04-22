@@ -20,10 +20,10 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore GLMS_ST10445830_Submission/GLMS_ST10445830.slnx
+      run: dotnet restore GLMS_ST10445830_Submission/GLMS_ST10445830.sln
 
     - name: Build solution
-      run: dotnet build GLMS_ST10445830_Submission/GLMS_ST10445830.slnx --no-restore --configuration Release
+      run: dotnet build GLMS_ST10445830_Submission/GLMS_ST10445830.sln --no-restore --configuration Release
 
     - name: Run unit tests
       run: dotnet test GLMS_ST10445830_Submission/GLMS_ST10445830.Tests --no-build --configuration Release --verbosity normal
