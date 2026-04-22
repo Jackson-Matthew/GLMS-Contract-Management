@@ -1,0 +1,166 @@
+﻿@model IEnumerable<GLMS_ST10445830.Models.Contract>
+@using GLMS_ST10445830.Models
+
+@{
+    ViewData["Title"] = "Contracts";
+}
+
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New Contract</a>
+</p>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5><i class="fas fa-search"></i> Search & Filter Contracts</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="Index">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Start Date From</label>
+                        <input type="date" name="startDateFrom" class="form-control" value="@ViewBag.StartDateFrom" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>End Date To</label>
+                        <input type="date" name="endDateTo" class="form-control" value="@ViewBag.EndDateTo" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Contract Status</label>
+                        <select name="contractStatus" class="form-control" asp-items="Html.GetEnumSelectList<GLMS_ST10445830.Models.Status>()">
+                            <option value="">-- All Statuses --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Service Level</label>
+                        <input type="text" name="serviceLevel" class="form-control" value="@ViewBag.ServiceLevel" placeholder="e.g., Premium, Standard" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" name="clientName" class="form-control" value="@ViewBag.ClientName" placeholder="Search by client name..." />
+                    </div>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (ViewBag.StartDateFrom != null || ViewBag.StartDateTo != null || ViewBag.EndDateFrom != null || ViewBag.EndDateTo != null || ViewBag.ContractStatus != null || ViewBag.ServiceLevel != null || ViewBag.ClientName != null)
+{
+    <div class="alert alert-info">
+        <strong>@Model.Count()</strong> contract(s) found matching your criteria.
+    </div>
+}
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Client</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Service Level</th>
+                    <th>Contract Document</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var duration = (item.EndDate - item.StartDate).Days;
+                    var statusClass = item.ContractStatus.ToString().ToLower();
+                    var badgeClass = statusClass switch
+                    {
+                                    "active" => "bg-success",
+                                    "draft" => "bg-warning",
+                                    "expired" => "bg-danger",
+                        _ => "bg-secondary"
+                    };
+
+                    <tr>
+                        <td>
+                            <strong>@item.Client?.Name</strong><br />
+                            <small class="text-muted">ID: @item.ClientId</small>
+                        </td>
+                        <td>@item.StartDate.ToString("dd MMM yyyy")</td>
+                        <td>@item.EndDate.ToString("dd MMM yyyy")</td>
+                        <td>
+                            @duration days
+                            @if (duration < 0)
+                            {
+                                <span class="badge bg-danger">Expired</span>
+                            }
+                            else if (duration < 30)
+                            {
+                                <span class="badge bg-warning">Ending soon</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge @badgeClass">@item.ContractStatus</span>
+                        </td>
+                        <td>@item.ServiceLevel</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.FilePath))
+                            {
+                                <a href="@item.FilePath" class="btn btn-sm btn-info" target="_blank" download>
+                                    <i class="fas fa-download"></i> Download PDF
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No file uploaded</span>
+                            }
+                        </td>
+                        <td>
+                            <div>
+                                <a asp-action="Edit" class="btn btn-warning" asp-route-id="@item.ContractId">
+                                     Edit
+                                </a>
+                                <a asp-action="Details" class="btn btn-primary" asp-route-id="@item.ContractId">
+                                     Details
+                                </a>
+                                <a asp-action="Delete" class="btn btn-danger" asp-route-id="@item.ContractId">
+                                     Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning text-center">
+        <i class="fas fa-exclamation-triangle fa-2x"></i>
+        <h4>No contracts found</h4>
+        <p>Try adjusting your search criteria or <a asp-action="Create">create a new contract</a>.</p>
+    </div>
+}
