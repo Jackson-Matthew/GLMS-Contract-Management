@@ -1,0 +1,29 @@
+name: .NET Unit Tests
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore GLMS_ST10445830_Submission/GLMS_ST10445830.slnx
+
+    - name: Build solution
+      run: dotnet build GLMS_ST10445830_Submission/GLMS_ST10445830.slnx --no-restore --configuration Release
+
+    - name: Run unit tests
+      run: dotnet test GLMS_ST10445830_Submission/GLMS_ST10445830.Tests --no-build --configuration Release --verbosity normal
