@@ -15,9 +15,25 @@ namespace GLMS_ST10445830.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Explicitly add environment variables so Docker env vars (with __)
+            // are guaranteed to override appsettings values
+            builder.Configuration
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+
+            // Resolve connection string and validate early so we get a clear error
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "ConnectionStrings:DefaultConnection is not set. " +
+                    "Ensure the environment variable ConnectionStrings__DefaultConnection is configured.");
+            }
+
             // Add DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(connectionString));
 
             // Register repositories
             builder.Services.AddScoped<IClientRepository, ClientRepository>();
@@ -32,19 +48,12 @@ namespace GLMS_ST10445830.API
             var jwtIssuer = builder.Configuration["Jwt:Issuer"];
             var jwtAudience = builder.Configuration["Jwt:Audience"];
 
-            // Use default values if not configured
             if (string.IsNullOrEmpty(jwtKey))
-            {
                 jwtKey = "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
-            }
             if (string.IsNullOrEmpty(jwtIssuer))
-            {
                 jwtIssuer = "GLMS_API";
-            }
             if (string.IsNullOrEmpty(jwtAudience))
-            {
                 jwtAudience = "GLMS_Client";
-            }
 
             var key = Encoding.UTF8.GetBytes(jwtKey);
 
@@ -102,10 +111,20 @@ namespace GLMS_ST10445830.API
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            // Remove this if you are not using HTTPS in Docker (port 80 only)
+            // app.UseHttpsRedirection();
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+
+            // Run migrations at startup
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                dbContext.Database.Migrate();
+            }
+
             app.Run();
         }
     }

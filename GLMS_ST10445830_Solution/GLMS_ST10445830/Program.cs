@@ -27,8 +27,12 @@ builder.Services.AddSession(options =>
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
+// Add HttpClientFactory
+builder.Services.AddHttpClient();
+
 // Register API services
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7001";
+apiBaseUrl = apiBaseUrl.TrimEnd('/');  // Remove trailing slash
 
 builder.Services.AddHttpClient<IContractApiService, ContractApiService>(client =>
 {
@@ -57,9 +61,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseAuthentication();  // Add this - BEFORE UseAuthorization
+app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();  // Add this - can be before or after auth
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

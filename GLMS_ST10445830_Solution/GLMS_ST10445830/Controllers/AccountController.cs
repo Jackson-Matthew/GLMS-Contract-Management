@@ -11,14 +11,13 @@ namespace GLMS_ST10445830.Controllers
     [AllowAnonymous]
     public class AccountController : Controller
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
 
-        public AccountController(HttpClient httpClient, IConfiguration configuration)
+        public AccountController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
-            _httpClient.BaseAddress = new Uri(_configuration["ApiBaseUrl"] ?? "https://localhost:7001");
         }
 
         [HttpGet]
@@ -34,21 +33,25 @@ namespace GLMS_ST10445830.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password)
         {
+            var apiBaseUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:7001";
+            apiBaseUrl = apiBaseUrl.TrimEnd('/');  // Remove trailing slash
+
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(apiBaseUrl);
+
             var loginData = new { username, password };
             var json = JsonSerializer.Serialize(loginData);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("/api/Auth/login", content);
+            var response = await client.PostAsync("/api/Auth/login", content);
 
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();
                 var tokenResponse = JsonSerializer.Deserialize<LoginResponse>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                // Store token in session
                 HttpContext.Session.SetString("AuthToken", tokenResponse?.Token ?? "");
 
-                // Create claims for cookie authentication
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, username),

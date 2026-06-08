@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="GLMS_ST10445830.API/GLMS_ST10445830.API.csproj" />
+  <Project Path="GLMS_ST10445830.Tests/GLMS_ST10445830.Tests.csproj" Id="56177d05-0705-48a3-be5e-b15d9c018083" />
   <Project Path="GLMS_ST10445830/GLMS_ST10445830.csproj" />
 </Solution>
