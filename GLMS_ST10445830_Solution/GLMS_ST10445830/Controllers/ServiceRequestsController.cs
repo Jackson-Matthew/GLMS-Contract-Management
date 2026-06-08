@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GLMS_ST10445830.Controllers
 {
+  
     [Authorize]
     public class ServiceRequestsController : Controller
     {

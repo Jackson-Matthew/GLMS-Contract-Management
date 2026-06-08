@@ -33,7 +33,7 @@ builder.Services.AddHttpClient();
 // Register API services
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7001";
 apiBaseUrl = apiBaseUrl.TrimEnd('/');  // Remove trailing slash
-
+builder.Services.AddHttpClient(); // Make sure this is present
 builder.Services.AddHttpClient<IContractApiService, ContractApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
@@ -57,13 +57,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

@@ -1,10 +1,12 @@
 using GLMS_ST10445830.Models;
 using GLMS_ST10445830.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace GLMS_ST10445830.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         public IActionResult Index()

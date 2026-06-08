@@ -34,45 +34,64 @@ namespace GLMS_ST10445830.Controllers
         public async Task<IActionResult> Login(string username, string password)
         {
             var apiBaseUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:7001";
-            apiBaseUrl = apiBaseUrl.TrimEnd('/');  // Remove trailing slash
+            apiBaseUrl = apiBaseUrl.TrimEnd('/');
 
-            var client = _httpClientFactory.CreateClient();
+            // Create handler to ignore SSL certificate errors (for development only)
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+
+            var client = new HttpClient(handler);
             client.BaseAddress = new Uri(apiBaseUrl);
 
             var loginData = new { username, password };
             var json = JsonSerializer.Serialize(loginData);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync("/api/Auth/login", content);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var result = await response.Content.ReadAsStringAsync();
-                var tokenResponse = JsonSerializer.Deserialize<LoginResponse>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var response = await client.PostAsync("/api/Auth/login", content);
 
-                HttpContext.Session.SetString("AuthToken", tokenResponse?.Token ?? "");
-
-                var claims = new List<Claim>
+                if (response.IsSuccessStatusCode)
                 {
-                    new Claim(ClaimTypes.Name, username),
-                    new Claim(ClaimTypes.Role, "User")
-                };
+                    var result = await response.Content.ReadAsStringAsync();
+                    var tokenResponse = JsonSerializer.Deserialize<LoginResponse>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
+                    // Store token in session
+                    HttpContext.Session.SetString("AuthToken", tokenResponse?.Token ?? "");
+
+                    // Create claims for cookie authentication
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, username),
+                        new Claim(ClaimTypes.Role, "User")
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                    };
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                    return RedirectToAction("Index", "Home");
+                }
+                else
                 {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-                };
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity), authProperties);
-
-                return RedirectToAction("Index", "Home");
+                    var error = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"Login failed: {response.StatusCode} - {error}");
+                    ViewBag.Error = "Invalid username or password";
+                    return View();
+                }
             }
-
-            ViewBag.Error = "Invalid username or password";
-            return View();
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Login exception: {ex.Message}");
+                ViewBag.Error = $"Connection error: {ex.Message}. Make sure the API is running on {apiBaseUrl}";
+                return View();
+            }
         }
 
         public async Task<IActionResult> Logout()

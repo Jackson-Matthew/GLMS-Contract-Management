@@ -118,11 +118,12 @@ namespace GLMS_ST10445830.API
             app.UseAuthorization();
             app.MapControllers();
 
-            // Run migrations at startup
+            // Run migrations at startup (skipped when using in-memory database for tests)
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                dbContext.Database.Migrate();
+                if (dbContext.Database.IsRelational())
+                    dbContext.Database.Migrate();
             }
 
             app.Run();
