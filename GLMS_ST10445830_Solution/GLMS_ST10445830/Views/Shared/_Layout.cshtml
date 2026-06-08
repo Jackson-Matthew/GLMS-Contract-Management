@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GLMS</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body>
+    <div class="d-flex" style="min-height: 100vh;">
+        <!-- Sidebar -->
+        <div class="bg-dark text-white" style="width: 250px; min-width: 250px;">
+            <div class="p-3">
+                <h4 class="text-center mb-4">GLMS</h4>
+                <hr class="bg-secondary" />
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="fas"></i> Dashboard
+                    </a>
+                    <a class="nav-link text-white" asp-area="" asp-controller="Clients" asp-action="Index">
+                        <i class="fas"></i> Clients
+                    </a>
+                    <a class="nav-link text-white" asp-area="" asp-controller="Contracts" asp-action="Index">
+                        <i class="fas"></i> Contracts
+                    </a>
+                    <a class="nav-link text-white" asp-area="" asp-controller="ServiceRequests" asp-action="Index">
+                        <i class="fas"></i> Service Requests
+                    </a>
+                    <hr class="bg-secondary" />
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a class="nav-link text-white" asp-controller="Account" asp-action="Logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                        <span class="text-muted small d-block mt-2 text-center">Hello, @User.Identity.Name!</span>
+                    }
+                    else
+                    {
+                        <a class="nav-link text-white" asp-controller="Account" asp-action="Login">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    }
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4 bg-light">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
