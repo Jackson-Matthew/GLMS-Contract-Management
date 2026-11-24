@@ -636,31 +636,3 @@ hr { border-color: var(--ud-border); opacity: 1; }
 .ud-auth-dots { position: absolute; pointer-events: none; }
 .ud-auth-dots.top { right: 4px; top: 4px; }
 .ud-auth-dots.bottom { left: 4px; bottom: 4px; }
-
-/* =========================================================
-   Dashboard speed-line texture panel
-   ========================================================= */
-.ud-speed-panel {
-    position: relative;
-    overflow: hidden;
-    margin: -1rem;
-    padding: 3.5rem 2rem;
-    border-radius: .75rem;
-    background:
-        url("../img/speed-lines.svg") center / cover no-repeat,
-        linear-gradient(115deg, #FFFFFF 0%, #EEF3FF 55%, #DCE6FF 100%);
-}
-[data-bs-theme=dark] .ud-speed-panel {
-    background:
-        url("../img/speed-lines.svg") center / cover no-repeat,
-        linear-gradient(115deg, #111928 0%, #16213B 55%, #1A2A55 100%);
-}
-.ud-speed-panel .ud-stat {
-    background: rgba(255, 255, 255, .82);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
-[data-bs-theme=dark] .ud-speed-panel .ud-stat { background: rgba(31, 42, 55, .82); }
-@media (max-width: 719.98px) {
-    .ud-speed-panel { margin: -.5rem; padding: 2rem 1rem; }
-}
