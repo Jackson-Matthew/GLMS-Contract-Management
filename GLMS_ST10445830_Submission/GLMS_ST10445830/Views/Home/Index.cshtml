@@ -1,0 +1,38 @@
+﻿<div class="d-flex" style="min-height: 100vh;">
+
+
+    <!-- Main Content -->
+    <div class="flex-grow-1 p-4 bg-light">
+
+        <h2 class="mb-4">Dashboard</h2>
+
+        <div class="row g-4">
+
+            <!-- Contracts Count -->
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5>Total Contracts</h5>
+                    <h2>@ViewBag.ContractCount</h2>
+                </div>
+            </div>
+
+            <!-- Service Requests Count -->
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5>Service Requests</h5>
+                    <h2>@ViewBag.ServiceRequestCount</h2>
+                </div>
+            </div>
+
+            <!-- Exchange Rate -->
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h5>USD to ZAR</h5>
+                    <h2>@ViewBag.ExchangeRate</h2>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<GLMS_ST10445830.Models.ServiceRequest>
+
+@{
+    ViewData["Title"] = "Service Requests";
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</p>
+
+@if (TempData["Conversion"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Conversion"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <th>USD Amount</th>
+            <th>ZAR Cost</th>
+            <th>Status</th>
+            <th>Contract</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                <td>@Html.DisplayFor(modelItem => item.USDAmount)</td>
+                <td>@Html.DisplayFor(modelItem => item.ZARCost)</td>              
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                <td>@Html.DisplayFor(modelItem => item.Contract.ContractId)</td>
+                <td>
+                    <a asp-action="Edit" class="btn btn-warning" asp-route-id="@item.ServiceRequestId">Edit</a> 
+                    <a asp-action="Details" class="btn btn-primary" asp-route-id="@item.ServiceRequestId">Details</a> 
+                    <a asp-action="Delete" class="btn btn-danger" asp-route-id="@item.ServiceRequestId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
