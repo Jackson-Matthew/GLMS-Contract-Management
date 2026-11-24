@@ -4,8 +4,12 @@
     ViewData["Title"] = "Clients";
 }
 
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</p>
 
-<table class="table">
+<div class="table-responsive">
+<table class="table table-hover">
     <thead>
         <tr>
             <th>
@@ -47,7 +51,5 @@
             
 }
     </tbody>
-    <p>
-        <a asp-action="Create" class="btn btn-success">Create New</a>
-    </p>
 </table>
+</div>

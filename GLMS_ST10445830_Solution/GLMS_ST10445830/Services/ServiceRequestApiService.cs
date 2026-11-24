@@ -53,6 +53,25 @@ namespace GLMS_ST10445830.Services
             }
         }
 
+        public async Task<decimal?> GetExchangeRateAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/ServiceRequests/exchange-rate");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<decimal>(json);
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get exchange rate");
+                return null;
+            }
+        }
+
         public async Task<ServiceRequest?> GetByIdAsync(int id)
         {
             try

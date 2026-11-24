@@ -9,5 +9,6 @@ namespace GLMS_ST10445830.Services
         Task<ServiceRequest?> CreateAsync(ServiceRequest request);
         Task<bool> UpdateAsync(ServiceRequest request);
         Task<bool> DeleteAsync(int id);
+        Task<decimal?> GetExchangeRateAsync();
     }
 }

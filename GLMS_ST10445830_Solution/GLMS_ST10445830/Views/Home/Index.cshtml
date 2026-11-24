@@ -1,38 +1,41 @@
-﻿<div class="d-flex" style="min-height: 100vh;">
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
 
-
-    <!-- Main Content -->
-    <div class="flex-grow-1 p-4 bg-light">
-
-        <h2 class="mb-4">Dashboard</h2>
-
-        <div class="row g-4">
-
-            <!-- Contracts Count -->
-            <div class="col-md-4">
-                <div class="card shadow-sm p-3">
-                    <h5>Total Contracts</h5>
-                    <h2>@ViewBag.ContractCount</h2>
+<div class="ud-speed-panel">
+<div class="row g-4">
+    <div class="col-md-4">
+        <a class="text-decoration-none" asp-controller="Contracts" asp-action="Index">
+            <div class="ud-stat">
+                <span class="ud-stat-icon" style="background:#3758F9"><i class="fas fa-file-contract"></i></span>
+                <div>
+                    <p class="ud-stat-label">Total Contracts</p>
+                    <h2 class="ud-stat-value">@ViewBag.ContractCount</h2>
                 </div>
             </div>
-
-            <!-- Service Requests Count -->
-            <div class="col-md-4">
-                <div class="card shadow-sm p-3">
-                    <h5>Service Requests</h5>
-                    <h2>@ViewBag.ServiceRequestCount</h2>
-                </div>
-            </div>
-
-            <!-- Exchange Rate -->
-            <div class="col-md-4">
-                <div class="card shadow-sm p-3">
-                    <h5>USD to ZAR</h5>
-                    <h2>@ViewBag.ExchangeRate</h2>
-                </div>
-            </div>
-
-        </div>
-
+        </a>
     </div>
+
+    <div class="col-md-4">
+        <a class="text-decoration-none" asp-controller="ServiceRequests" asp-action="Index">
+            <div class="ud-stat">
+                <span class="ud-stat-icon" style="background:#13C296"><i class="fas fa-tools"></i></span>
+                <div>
+                    <p class="ud-stat-label">Service Requests</p>
+                    <h2 class="ud-stat-value">@ViewBag.ServiceRequestCount</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <div class="ud-stat">
+            <span class="ud-stat-icon" style="background:#FBBF24"><i class="fas fa-exchange-alt"></i></span>
+            <div>
+                <p class="ud-stat-label">USD to ZAR</p>
+                <h2 class="ud-stat-value">@ViewBag.ExchangeRate</h2>
+            </div>
+        </div>
+    </div>
+</div>
 </div>

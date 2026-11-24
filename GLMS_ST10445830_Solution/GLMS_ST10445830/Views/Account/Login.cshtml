@@ -8,79 +8,53 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - GLMS</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-card {
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 30px;
-            text-align: center;
-        }
-        .login-header h3 {
-            color: white;
-            margin: 0;
-        }
-        .login-body {
-            padding: 40px;
-            background: white;
-        }
-        .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .btn-login:hover {
-            opacity: 0.9;
-        }
-    </style>
+    <title>Sign In | GLMS</title>
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme');
+            var dark = t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="login-card">
-                    <div class="login-header">
-                        <h3>GLMS - Login</h3>
-                        <p class="text-white mb-0 mt-2">Ground Lease Management System</p>
-                    </div>
-                    <div class="login-body">
-                        @if (ViewBag.Error != null)
-                        {
-                            <div class="alert alert-danger">@ViewBag.Error</div>
-                        }
-
-                        <form method="post">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Username</label>
-                                <input type="text" name="username" class="form-control" placeholder="Enter username" required autocomplete="off" />
-                            </div>
-                            <div class="form-group mb-3">
-                                <label class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control" placeholder="Enter password" required />
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-login w-100">Login</button>
-                        </form>
-                        <div class="mt-4 text-center text-muted">
-                            <small>Demo credentials &mdash; username: <strong>admin</strong> / password: <strong>password</strong></small>
-                        </div>
-                    </div>
-                </div>
+    <section class="ud-auth">
+        <div class="ud-auth-box">
+            <div class="mb-4">
+                <span class="ud-logo">
+                    <span class="ud-logo-mark"><i class="fas fa-globe-africa"></i></span>
+                    <span class="ud-logo-text">GLMS</span>
+                </span>
+                <p class="mt-3 mb-0">Global Logistics Management Service</p>
             </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger text-start">@ViewBag.Error</div>
+            }
+
+            <form method="post">
+                <input type="text" name="username" class="form-control" placeholder="Username" required autocomplete="off" aria-label="Username" />
+                <input type="password" name="password" class="form-control" placeholder="Password" required aria-label="Password" />
+                <button type="submit" class="btn btn-primary mb-4">Sign In</button>
+            </form>
+
+            <p class="mb-0 text-muted small">
+                Demo credentials &mdash; username: <strong>admin</strong> / password: <strong>password</strong>
+            </p>
+
+            <svg class="ud-auth-dots top" width="40" height="40" viewBox="0 0 40 40" fill="#3056D3" aria-hidden="true">
+                @for (var r = 0; r < 4; r++) { for (var c = 0; c < 4; c++) { <circle cx="@(2 + c * 12)" cy="@(2 + r * 12)" r="1.4" /> } }
+            </svg>
+            <svg class="ud-auth-dots bottom" width="40" height="40" viewBox="0 0 40 40" fill="#3056D3" aria-hidden="true">
+                @for (var r = 0; r < 4; r++) { for (var c = 0; c < 4; c++) { <circle cx="@(2 + c * 12)" cy="@(2 + r * 12)" r="1.4" /> } }
+            </svg>
         </div>
-    </div>
+    </section>
 </body>
 </html>

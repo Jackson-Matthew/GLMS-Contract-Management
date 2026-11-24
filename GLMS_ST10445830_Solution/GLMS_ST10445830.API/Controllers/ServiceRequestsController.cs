@@ -40,6 +40,14 @@ namespace GLMS_ST10445830.API.Controllers
             return Ok(new ServiceRequestDto(request));
         }
 
+        // Returns the current USD -> ZAR rate (value of 1 USD in ZAR) using the configured converter
+        [HttpGet("exchange-rate")]
+        public async Task<ActionResult<decimal>> GetExchangeRate()
+        {
+            var rate = await _currencyConverter.ConvertUsdToZar(1m);
+            return Ok(rate);
+        }
+
         [HttpGet("contract/{contractId}")]
         public async Task<ActionResult<IEnumerable<ServiceRequestDto>>> GetServiceRequestsByContract(int contractId)
         {

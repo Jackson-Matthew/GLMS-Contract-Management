@@ -1,58 +1,183 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Home";
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+    var title = ViewData["Title"]?.ToString() ?? controller;
+    var sectionName = controller switch
+    {
+        "Home" => "Dashboard",
+        "ServiceRequests" => "Service Requests",
+        _ => controller
+    };
+    var isIndex = action == "Index";
+    var singular = controller == "ServiceRequests" ? "Service Request" : controller.TrimEnd('s');
+    var pageHeading = ViewData["Heading"]?.ToString()
+        ?? (isIndex || controller == "Home" || title.Contains(singular) ? title : $"{title} {singular}");
+
+    var menu = new[]
+    {
+        (Title: "Dashboard", Controller: "Home"),
+        (Title: "Clients", Controller: "Clients"),
+        (Title: "Contracts", Controller: "Contracts"),
+        (Title: "Service Requests", Controller: "ServiceRequests"),
+    };
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - GLMS</title>
+    <title>@title | GLMS</title>
+    <script>
+        // Apply saved / system theme before paint to avoid a flash
+        (function () {
+            var t = localStorage.getItem('theme');
+            var dark = t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="d-flex" style="min-height: 100vh;">
-        <!-- Sidebar -->
-        <div class="bg-dark text-white" style="width: 250px; min-width: 250px;">
-            <div class="p-3">
-                <h4 class="text-center mb-4">GLMS</h4>
-                <hr class="bg-secondary" />
-                <nav class="nav flex-column">
-                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">
-                        <i class="fas"></i> Dashboard
-                    </a>
-                    <a class="nav-link text-white" asp-area="" asp-controller="Clients" asp-action="Index">
-                        <i class="fas"></i> Clients
-                    </a>
-                    <a class="nav-link text-white" asp-area="" asp-controller="Contracts" asp-action="Index">
-                        <i class="fas"></i> Contracts
-                    </a>
-                    <a class="nav-link text-white" asp-area="" asp-controller="ServiceRequests" asp-action="Index">
-                        <i class="fas"></i> Service Requests
-                    </a>
-                    <hr class="bg-secondary" />
+    <!-- ====== Header ====== -->
+    <header class="ud-header">
+        <div class="container">
+            <div class="ud-header-inner">
+                <a class="ud-logo" asp-controller="Home" asp-action="Index">
+                    <span class="ud-logo-mark"><i class="fas fa-globe-africa"></i></span>
+                    <span class="ud-logo-text">GLMS</span>
+                </a>
+
+                <button id="navbarToggler" class="ud-toggler" type="button" aria-label="Toggle navigation">
+                    <span></span><span></span><span></span>
+                </button>
+
+                <nav id="navbarCollapse" class="ud-nav">
+                    <ul>
+                        @foreach (var item in menu)
+                        {
+                            <li>
+                                <a asp-controller="@item.Controller" asp-action="Index"
+                                   class="@(controller == item.Controller ? "active" : "")">@item.Title</a>
+                            </li>
+                        }
+                    </ul>
+                    <div class="ud-nav-actions-mobile">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a asp-controller="Account" asp-action="Logout">Logout</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Login">Sign In</a>
+                        }
+                    </div>
+                </nav>
+
+                <div class="ud-header-actions">
+                    <button id="themeSwitcher" class="ud-theme-switcher" type="button" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon icon-light"></i>
+                        <i class="fas fa-sun icon-dark"></i>
+                    </button>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <a class="nav-link text-white" asp-controller="Account" asp-action="Logout">
-                            <i class="fas fa-sign-out-alt"></i> Logout
+                        <span class="ud-user d-none d-md-inline">Hello, <strong>@User.Identity.Name</strong></span>
+                        <a class="ud-btn-primary d-none d-sm-inline-flex" asp-controller="Account" asp-action="Logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
                         </a>
-                        <span class="text-muted small d-block mt-2 text-center">Hello, @User.Identity.Name!</span>
                     }
                     else
                     {
-                        <a class="nav-link text-white" asp-controller="Account" asp-action="Login">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </a>
+                        <a class="ud-btn-primary d-none d-sm-inline-flex" asp-controller="Account" asp-action="Login">Sign In</a>
                     }
-                </nav>
+                </div>
             </div>
         </div>
+    </header>
 
-        <!-- Main Content -->
-        <div class="flex-grow-1 p-4 bg-light">
-            <main role="main">
-                @RenderBody()
-            </main>
+    <!-- ====== Page title / breadcrumb ====== -->
+    <section class="ud-breadcrumb">
+        <div class="container text-center">
+            <h1>@pageHeading</h1>
+            <ul>
+                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                @if (controller != "Home")
+                {
+                    <li><span>/</span>
+                        @if (isIndex)
+                        {
+                            <span class="current">@sectionName</span>
+                        }
+                        else
+                        {
+                            <a asp-controller="@controller" asp-action="Index">@sectionName</a>
+                        }
+                    </li>
+                }
+                @if (!isIndex)
+                {
+                    <li><span>/</span> <span class="current">@title</span></li>
+                }
+            </ul>
         </div>
-    </div>
+    </section>
+
+    <!-- ====== Main content ====== -->
+    <main role="main" class="ud-main">
+        <div class="container">
+            <div class="ud-content-card">
+                @RenderBody()
+            </div>
+        </div>
+    </main>
+
+    <!-- ====== Footer ====== -->
+    <footer class="ud-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-md-6 mb-5">
+                    <a class="ud-logo ud-logo-light mb-4" asp-controller="Home" asp-action="Index">
+                        <span class="ud-logo-mark"><i class="fas fa-globe-africa"></i></span>
+                        <span class="ud-logo-text">GLMS</span>
+                    </a>
+                    <p class="ud-footer-text">
+                        Global Logistics Management Service &mdash; manage clients, contracts
+                        and service requests in one place.
+                    </p>
+                </div>
+                <div class="col-lg-3 col-md-3 col-6 mb-5">
+                    <h4>Manage</h4>
+                    <ul>
+                        @foreach (var item in menu)
+                        {
+                            <li><a asp-controller="@item.Controller" asp-action="Index">@item.Title</a></li>
+                        }
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-3 col-6 mb-5">
+                    <h4>Quick actions</h4>
+                    <ul>
+                        <li><a asp-controller="Clients" asp-action="Create">New client</a></li>
+                        <li><a asp-controller="Contracts" asp-action="Create">New contract</a></li>
+                        <li><a asp-controller="ServiceRequests" asp-action="Create">New service request</a></li>
+                        <li><a asp-controller="Home" asp-action="Privacy">Privacy policy</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="ud-footer-bottom">
+            <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+                <span>&copy; @DateTime.Now.Year GLMS. All rights reserved.</span>
+            </div>
+        </div>
+        <img class="ud-footer-shape-1" src="~/img/shape-1.svg" alt="" />
+        <img class="ud-footer-shape-3" src="~/img/shape-3.svg" alt="" />
+    </footer>
+
+    <a href="#" class="back-to-top" aria-label="Back to top"><span></span></a>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
